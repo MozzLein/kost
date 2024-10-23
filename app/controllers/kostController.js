@@ -44,7 +44,7 @@ exports.getAllKost = async (req, res) => {
             where : {
                 city : data.city
             },
-            attributes : ['id', 'kostName', 'description', 'price', 'image', 'city', 'address', 'latitude', 'longitude']
+            attributes : ['id', 'kostName', 'description', 'kostType', 'price', 'image', 'city', 'address', 'latitude', 'longitude']
         })
 
         if(kosts.length === 0){
@@ -175,9 +175,47 @@ exports.deleteKost = async (req, res) => {
     }
 }
 
-exports.filterKost = async (req, res) => {
+exports.getFilteredKost = async (req, res) => {
     try {
+        //check validation
+        if(checkValidation(req, res) !== true) return
+
+        //get data
+        const data = matchedData(req)
+
+        //get kosts from db
+        const kosts = await Kosts.findAll({where : {city: data.city}, attributes: ['id', 'kostName', 'description','kostType', 'facilities', 'price', 'image', 'city', 'address', 'latitude', 'longitude']})
+
+        const kostsFiltered = kosts.filter((kost) => {
+            //filter for the price
+            const [minPrice, maxPrice] = data.price.split('-').map(Number)
+            const price = parseInt(kost.price)
+            const priceFiltered = price >= minPrice && price <= maxPrice
+
+            //filter for the facilities
+            const facilities = new Set(data.facilities.split(', '))
+            const kostFacilities = new Set(kost.facilities.split(', '))
+            const facilitiesFiltered = [...facilities].every(facility => kostFacilities.has(facility))
+
+            //filter for kost type
+            const type = data.type
+            const kostTypeFiltered = type == kost.kostType 
+
+            return kostTypeFiltered && priceFiltered && facilitiesFiltered
+        })
         
+        if(kostsFiltered.length === 0){
+            return res.status(404).send({
+                statusCode : 404,
+                message : "Kost not found"
+            })
+        }
+
+        res.status(200).send({
+            statusCode : 200,
+            message : "Success", 
+            data : kostsFiltered
+        })
     } catch (error) {
         res.status(500).send({
             statusCode : 500,
@@ -186,4 +224,4 @@ exports.filterKost = async (req, res) => {
         })
     }
 }
-//TODO: filterKost, addReview, getReviews, updateAvailability, getKostByOwner, bookingKost (delete if clear)
+//TODO:  addReview, getReviews, bookingKost (delete if clear)

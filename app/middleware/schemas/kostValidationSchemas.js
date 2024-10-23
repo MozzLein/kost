@@ -292,3 +292,22 @@ exports.deleteKostSchema = {
         }
     }
 }
+
+exports.getFilteredKostSchema = {
+    city: {
+        optional: { options: { nullable: true } },
+        isString: true
+    },
+    facilities: {
+        optional: { options: { nullable: true } },
+        isString: true
+    },
+    type: {
+        optional: { options: { nullable: true } },
+        isString: true
+    },
+    price: {
+        optional: { options: { nullable: true } },
+        isString: true   
+    }
+}

@@ -8,8 +8,8 @@ const { getAdminProfile, editAdminProfile, addBankAccount, editBankAccount, dele
 const { userRegister, userLogin, getUserRegister, getUserLogin } = require('../controllers/authController')
 const { verifyToken } = require('../middleware/authMiddleware')
 const { adminBankAccountSchema, adminDeleteSchema } = require('../middleware/schemas/adminValidationSchemas')
-const { getAllKost, addKost, getKost, editKost, deleteKost } = require('../controllers/kostController')
-const { getAllKostSchema, addKostSchema, getKostSchema, editKostSchema, deleteKostSchema } = require('../middleware/schemas/kostValidationSchemas')
+const { getAllKost, addKost, getKost, editKost, deleteKost, getFilteredKost } = require('../controllers/kostController')
+const { getAllKostSchema, addKostSchema, getKostSchema, editKostSchema, deleteKostSchema, getFilteredKostSchema } = require('../middleware/schemas/kostValidationSchemas')
 
 //auth routes
 router.get('/auth/register', getUserRegister)
@@ -19,8 +19,9 @@ router.get('/auth/login', getUserLogin)
 router.get('/user/:id', [verifyToken, checkSchema(getUserProfileSchema)], getUserProfile)
 
 //FIXME: later add verify to this line of route.
-router.get('/kost/', checkSchema(getAllKostSchema), getAllKost)
+router.get('/kost/:city', checkSchema(getAllKostSchema), getAllKost)
 router.get('/kost/:kostId', checkSchema(getKostSchema), getKost)
+router.get('/kost/:city/filter/', checkSchema(getFilteredKostSchema), getFilteredKost)
 
 router.post('/auth/register', checkSchema(userRegistrationSchema),  userRegister) 
 router.post('/auth/login', checkSchema(userLoginSchema), userLogin)
