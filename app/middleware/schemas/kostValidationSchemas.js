@@ -31,6 +31,12 @@ exports.addKostSchema = {
             errorMessage: "Description must be at least 0-500 characters long"
         },
     },
+    kostType: {
+        notEmpty: {
+            errorMessage: "Kost type is required"
+        },
+        isString: true
+    },
     address: {
         notEmpty: {
             errorMessage: "Kost address is required"
@@ -187,6 +193,10 @@ exports.editKostSchema = {
             options: { min: 0, max: 500},
             errorMessage: "Description must be at least 0-500 characters long"
         },
+    },
+    kostType: {
+        optional: { options: { nullable: true } },
+        isString: true
     },
     address: {
         optional: { options: { nullable: true } },

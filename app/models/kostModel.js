@@ -30,6 +30,13 @@ const Kosts = sequelize.define("kosts", {
             notEmpty : true
         }
     },
+    kostType:{
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate:{
+            notEmpty : true
+        }
+    },
     address:{
         type: DataTypes.STRING,
         allowNull: false,
