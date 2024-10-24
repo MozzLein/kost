@@ -8,8 +8,9 @@ const { getAdminProfile, editAdminProfile, addBankAccount, editBankAccount, dele
 const { userRegister, userLogin, getUserRegister, getUserLogin } = require('../controllers/authController')
 const { verifyToken } = require('../middleware/authMiddleware')
 const { adminBankAccountSchema, adminDeleteSchema } = require('../middleware/schemas/adminValidationSchemas')
-const { getAllKost, addKost, getKost, editKost, deleteKost, getFilteredKost } = require('../controllers/kostController')
+const { getAllKost, addKost, getKost, editKost, deleteKost, getFilteredKost, addReview, getReview } = require('../controllers/kostController')
 const { getAllKostSchema, addKostSchema, getKostSchema, editKostSchema, deleteKostSchema, getFilteredKostSchema } = require('../middleware/schemas/kostValidationSchemas')
+const { addReviewSchema, getReviewSchema } = require('../middleware/schemas/reviewValidationSchemas')
 
 //auth routes
 router.get('/auth/register', getUserRegister)
@@ -22,10 +23,11 @@ router.get('/user/:id', [verifyToken, checkSchema(getUserProfileSchema)], getUse
 router.get('/kost/:city', checkSchema(getAllKostSchema), getAllKost)
 router.get('/kost/:kostId', checkSchema(getKostSchema), getKost)
 router.get('/kost/:city/filter/', checkSchema(getFilteredKostSchema), getFilteredKost)
+router.get('/kost/:kostId/review', checkSchema(getReviewSchema), getReview)
 
 router.post('/auth/register', checkSchema(userRegistrationSchema),  userRegister) 
 router.post('/auth/login', checkSchema(userLoginSchema), userLogin)
-
+router.post('/kost/:kostId/review/:userId/', [checkSchema(addReviewSchema)], addReview)
 
 router.put('/user/:userId/edit', [verifyToken, checkSchema(editUserProfileSchema)], editUserProfile)
 

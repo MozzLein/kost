@@ -136,7 +136,7 @@ const Kosts = sequelize.define("kosts", {
         }
     },
     rating:{
-        type: DataTypes.STRING,
+        type: DataTypes.FLOAT,
         allowNull: false,
         validate:{
             notEmpty : true

@@ -1,7 +1,6 @@
 const Kosts = require("../../models/kostModel")
 const Users = require("../../models/usersModel")
 
-
 exports.addKostSchema = {
     adminId: {
         notEmpty: {

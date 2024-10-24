@@ -1,6 +1,8 @@
-const {matchedData, check} = require('express-validator')
+const {matchedData} = require('express-validator')
 const Kosts = require('../models/kostModel.js')
 const { checkValidation } = require('../helper/checkValidation.js')
+const Users = require('../models/usersModel.js')
+const Reviews = require('../models/reviewModel.js')
 require('dotenv').config()
 
 exports.addKost = async (req, res) => {
@@ -13,7 +15,7 @@ exports.addKost = async (req, res) => {
         const {adminId : adminRelation} = data
         
         //add kost to db
-        await Kosts.create({adminRelation, ...data})
+        await Kosts.create({adminRelation, ...data, rating: 0})
 
         res.status(201).send({
             statusCode : 201,
@@ -29,8 +31,6 @@ exports.addKost = async (req, res) => {
     }
 }
 
-//FIXME: come back here, maybe there is something missing
-// this code will be only get the kost by city (by query, cuz this is GET route)
 exports.getAllKost = async (req, res) => {
     try {
         //check validation
@@ -44,7 +44,7 @@ exports.getAllKost = async (req, res) => {
             where : {
                 city : data.city
             },
-            attributes : ['id', 'kostName', 'description', 'kostType', 'price', 'image', 'city', 'address', 'latitude', 'longitude']
+            attributes : ['id', 'kostName', 'description', 'kostType', 'price', 'image', 'city', 'address', 'latitude', 'longitude', 'rating']
         })
 
         if(kosts.length === 0){
@@ -53,7 +53,6 @@ exports.getAllKost = async (req, res) => {
                 message : "Kost not found"
             })
         }
-
         res.status(200).send({
             statusCode : 200,
             message : "Success",
@@ -184,7 +183,7 @@ exports.getFilteredKost = async (req, res) => {
         const data = matchedData(req)
 
         //get kosts from db
-        const kosts = await Kosts.findAll({where : {city: data.city}, attributes: ['id', 'kostName', 'description','kostType', 'facilities', 'price', 'image', 'city', 'address', 'latitude', 'longitude']})
+        const kosts = await Kosts.findAll({where : {city: data.city}, attributes: ['id', 'kostName', 'description','kostType', 'facilities', 'price', 'image', 'city', 'address', 'latitude', 'longitude', 'rating']})
 
         const kostsFiltered = kosts.filter((kost) => {
             //filter for the price
@@ -224,4 +223,83 @@ exports.getFilteredKost = async (req, res) => {
         })
     }
 }
-//TODO:  addReview, getReviews, bookingKost (delete if clear)
+
+exports.addReview = async (req, res) => {
+    try {
+        //check validation
+        if(checkValidation(req, res) !== true) return
+
+        //get data
+        const { kostId, userId, rating, comment } = matchedData(req)
+
+        //get kost from db
+        const kost = await Kosts.findOne({ where: { id: kostId } })
+
+        if(!kost){
+            return res.status(404).send({
+                statusCode : 404,
+                message : "Kost not found"
+            })
+        }
+
+        //check if users already reviewed
+        const review = await Reviews.findOne({ where: { kostId, userId } })
+
+        if(review){
+            return res.status(400).send({
+                statusCode : 400,
+                message : "You already reviewed this kost",
+            })
+        }
+
+        //get all reviews rating
+        const reviewRatings = await Reviews.findAll({ where: { kostId }, attributes: ['rating'] })
+
+        //calculate new rating
+        const newRating = (reviewRatings.reduce((a, b) => a + parseInt(b.dataValues.rating), 0) + parseInt(rating)) / (reviewRatings.length + 1)
+
+        //add review to db
+        await Reviews.create({ kostId, userId, rating, comment })
+
+        res.status(201).send({
+            statusCode : 201,
+            message : "Review added successfully",
+            newRating: newRating.toFixed(1)
+        })
+
+    } catch (error) {
+        res.status(500).send({
+            statusCode : 500,
+            message : "Server error",
+            error
+        })
+    }
+}
+
+exports.getReview = async (req, res) => {
+    try {
+        //check validation
+        if(checkValidation(req, res) !== true) return
+        
+        //get data
+        const data = matchedData(req)
+        const {kostId} = data
+
+        //get reviews from db
+        const reviews = await Reviews.findAll({where : {kostId}, attributes: ['id', 'userId', 'rating', 'comment']})
+
+        res.status(200).send({
+            statusCode : 200,
+            message : "Success",
+            data : reviews
+        })
+    } catch (error) {
+        res.status(500).send({
+            statusCode : 500,
+            message : "Server error",
+            error
+        })
+    }
+}
+
+//TODO:  bookingKost (delete if clear)
