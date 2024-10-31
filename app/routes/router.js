@@ -11,6 +11,8 @@ const { adminBankAccountSchema, adminDeleteSchema } = require('../middleware/sch
 const { getAllKost, addKost, getKost, editKost, deleteKost, getFilteredKost, addReview, getReview } = require('../controllers/kostController')
 const { getAllKostSchema, addKostSchema, getKostSchema, editKostSchema, deleteKostSchema, getFilteredKostSchema } = require('../middleware/schemas/kostValidationSchemas')
 const { addReviewSchema, getReviewSchema } = require('../middleware/schemas/reviewValidationSchemas')
+const { userBookingKostSchema, getUserBookingKostSchema } = require('../middleware/schemas/bookingKostValidationSchemas')
+const { userBookingKost, getUserBookingKost } = require('../controllers/bookingController')
 
 //auth routes
 router.get('/auth/register', getUserRegister)
@@ -19,15 +21,16 @@ router.get('/auth/login', getUserLogin)
 //user routes
 router.get('/user/:id', [verifyToken, checkSchema(getUserProfileSchema)], getUserProfile)
 
-//FIXME: later add verify to this line of route.
 router.get('/kost/:city', checkSchema(getAllKostSchema), getAllKost)
 router.get('/kost/:kostId', checkSchema(getKostSchema), getKost)
 router.get('/kost/:city/filter/', checkSchema(getFilteredKostSchema), getFilteredKost)
 router.get('/kost/:kostId/review', checkSchema(getReviewSchema), getReview)
+router.get('/user/:userId/booking', checkSchema(getUserBookingKostSchema), getUserBookingKost)
 
 router.post('/auth/register', checkSchema(userRegistrationSchema),  userRegister) 
 router.post('/auth/login', checkSchema(userLoginSchema), userLogin)
 router.post('/kost/:kostId/review/:userId/', [checkSchema(addReviewSchema)], addReview)
+router.post('/kost/:kostId/booking/:userId', [ checkSchema(userBookingKostSchema)], userBookingKost)
 
 router.put('/user/:userId/edit', [verifyToken, checkSchema(editUserProfileSchema)], editUserProfile)
 
@@ -38,7 +41,6 @@ router.get('/admin/:userId', [verifyToken, checkSchema(getUserProfileSchema)], g
 
 router.post('/admin/:adminId/account', [verifyToken, checkSchema(adminBankAccountSchema)], addBankAccount)
 
-//FIXME: later add verify to this line of route.
 router.post('/admin/:adminId/kost/add', checkSchema(addKostSchema), addKost)
 
 router.put('/admin/:userId', [verifyToken, checkSchema(editUserProfileSchema)], editAdminProfile)
@@ -50,3 +52,6 @@ router.delete('/admin/:adminId/account/delete', [verifyToken, checkSchema(adminD
 router.delete('/admin/:adminId/kost/:kostId/delete', checkSchema(deleteKostSchema), deleteKost)
 
 module.exports = router
+
+
+//FIXME: dont forget to add verifyToken to routes

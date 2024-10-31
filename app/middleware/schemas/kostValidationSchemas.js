@@ -100,7 +100,7 @@ exports.addKostSchema = {
         notEmpty: {
             errorMessage: "Availability is required"
         },
-        isString: true
+        isFloat: true
     },
     facilities: {
         notEmpty: {

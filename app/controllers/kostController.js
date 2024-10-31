@@ -1,7 +1,7 @@
 const {matchedData} = require('express-validator')
 const Kosts = require('../models/kostModel.js')
 const { checkValidation } = require('../helper/checkValidation.js')
-const Users = require('../models/usersModel.js')
+
 const Reviews = require('../models/reviewModel.js')
 require('dotenv').config()
 
@@ -301,5 +301,3 @@ exports.getReview = async (req, res) => {
         })
     }
 }
-
-//TODO:  bookingKost (delete if clear)

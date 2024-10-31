@@ -108,7 +108,7 @@ const Kosts = sequelize.define("kosts", {
         }
     },
     availability:{
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false,
         validate:{
             notEmpty : true
