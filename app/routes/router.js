@@ -31,6 +31,7 @@ router.post('/auth/register', checkSchema(userRegistrationSchema),  userRegister
 router.post('/auth/login', checkSchema(userLoginSchema), userLogin)
 router.post('/kost/:kostId/review/:userId/', [checkSchema(addReviewSchema)], addReview)
 router.post('/kost/:kostId/booking/:userId', [ checkSchema(userBookingKostSchema)], userBookingKost)
+router.post('/kost/:kostId/transaction/:userId')
 
 router.put('/user/:userId/edit', [verifyToken, checkSchema(editUserProfileSchema)], editUserProfile)
 
